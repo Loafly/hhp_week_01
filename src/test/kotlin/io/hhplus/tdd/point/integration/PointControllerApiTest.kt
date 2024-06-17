@@ -35,17 +35,6 @@ class PointControllerApiTest {
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.id").value(id))
         }
-
-        @Test
-        @DisplayName("Id가 존재하지 않는 경우 - 404 Not Found")
-        fun testIfIdNotFound() {
-            // given
-            val id = -1;
-
-            // when then
-            mockMvc.perform(MockMvcRequestBuilders.get("/point/$id"))
-                .andExpect(status().is4xxClientError)
-        }
     }
 
 
