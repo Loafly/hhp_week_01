@@ -1,28 +1,28 @@
-package io.hhplus.tdd.point
-
-import org.junit.jupiter.api.Test
+package io.hhplus.tdd.point.integration
 
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 
-@WebMvcTest(PointController::class)
-// API(EtoE) 테스트
-class PointControllerTest() {
+@SpringBootTest
+@AutoConfigureMockMvc
+// API 테스트
+class PointControllerApiTest {
 
     @Autowired
     private lateinit var mockMvc: MockMvc
 
     @Nested
     @DisplayName("포인트 조회")
-    inner class PointGetTest{
+    inner class PointGetTest {
 
         @Test
         @DisplayName("200 OK")
@@ -37,8 +37,8 @@ class PointControllerTest() {
         }
 
         @Test
-        @DisplayName("Id가 존재하지 않는 경우 - 400 Bad Request")
-        fun success2() {
+        @DisplayName("Id가 존재하지 않는 경우 - 404 Not Found")
+        fun testIfIdNotFound() {
             // given
             val id = -1;
 
