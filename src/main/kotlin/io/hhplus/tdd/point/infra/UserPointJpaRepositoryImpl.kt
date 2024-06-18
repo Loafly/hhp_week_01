@@ -10,4 +10,8 @@ class UserPointRepositoryImpl(private val userPointTable: UserPointTable) : User
     override fun findById(id: Long): UserPoint {
         return userPointTable.selectById(id)
     }
+
+    override fun save(id: Long, point: Long): UserPoint {
+        return userPointTable.insertOrUpdate(id, point)
+    }
 }
