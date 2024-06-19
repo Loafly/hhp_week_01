@@ -30,8 +30,7 @@ class UserPointServiceTest {
     private lateinit var userPointService: UserPointService
 
     @Test
-    @DisplayName("포인트 조회")
-    fun getUserPoint() {
+    fun `포인트 조회`() {
         // given
         val expectedUserPoint = UserPoint(id = 1, point = 100, updateMillis = 1000) //기대 객체 생성
         `when`(mockUserPointRepository.findById(expectedUserPoint.id)).thenReturn(expectedUserPoint) // mockUserPointRepository의 findById 함수 호출 시 기대객체로 반환
@@ -48,8 +47,7 @@ class UserPointServiceTest {
     @DisplayName("포인트 충전")
     inner class ChargeUserPointTest {
         @Test
-        @DisplayName("한 명의 사용자 업데이트")
-        fun success() {
+        fun `한 명의 사용자 업데이트`() {
             // given
             val expectedFindUserPoint = UserPoint(id = 1, point = 100, updateMillis = 1000) //기대 객체 생성
             val amount: Long = 50
@@ -66,8 +64,7 @@ class UserPointServiceTest {
         }
 
         @Test
-        @DisplayName("동시에 한 명의 사용자 업데이트")
-        fun successIfConcurrencyCase() {
+        fun `동시에 한 명의 사용자 업데이트`() {
             // TODO :
         }
     }
