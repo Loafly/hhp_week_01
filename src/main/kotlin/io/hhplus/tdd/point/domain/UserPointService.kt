@@ -27,4 +27,13 @@ class UserPointService(private val userPointRepository: UserPointRepository,
             return updateUserPoint
         }
     }
+
+    fun useUserPoint(id: Long, amount: Long): UserPoint {
+        val userPoint = getUserPointById(id)
+        if(userPoint.point < amount) {
+            throw IllegalArgumentException("사용하려는 포인트가 가지고있는 포인트보다 많습니다.")
+        }
+        val totalPoint = userPoint.point - amount
+        return updateUserPoint(userPoint.id, totalPoint)
+    }
 }

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
@@ -47,7 +48,7 @@ class UserPointServiceTest {
     @DisplayName("포인트 충전")
     inner class ChargeUserPointTest {
         @Test
-        fun `한 명의 사용자 업데이트`() {
+        fun `한 명의 사용자 포인트 충전`() {
             // given
             val expectedFindUserPoint = UserPoint(id = 1, point = 100, updateMillis = 1000) //기대 객체 생성
             val amount: Long = 50
@@ -62,10 +63,50 @@ class UserPointServiceTest {
             assertNotNull(userPoint)
             assertEquals(expectedSaveUserPoint, userPoint)
         }
+    }
+
+    @Nested
+    @DisplayName("포인트 사용")
+    inner class UseUserPointTest {
+        @Test
+        fun `한 명의 사용자 포인트 사용`() {
+            //given
+            val id = 1L
+            val amount = 500L
+            val point = 1000L
+            val totalPoint = point - amount
+
+            val expectedFindUserPoint = UserPoint(id = id, point = point, updateMillis = 1000)
+            `when`(mockUserPointRepository.findById(id)).thenReturn(expectedFindUserPoint)
+
+            val expectedSaveUserPoint = UserPoint(id = id, point = totalPoint, updateMillis = 1000)
+            `when`(mockUserPointRepository.save(id, totalPoint)).thenReturn(expectedSaveUserPoint)
+
+            //when
+            val result = userPointService.useUserPoint(id, amount)
+
+            //then
+            assertNotNull(result)
+            assertEquals(expectedSaveUserPoint, result)
+        }
 
         @Test
-        fun `동시에 한 명의 사용자 업데이트`() {
-            // TODO :
+        fun `사용 금액이 가지고 있는 포인트보다 큰 경우`() {
+            //given
+            val id = 1L
+            val amount = 1000L
+            val point = 500L
+            val expectedUserPoint = UserPoint(id = id, point = point, updateMillis = 1000)
+            `when`(mockUserPointRepository.findById(id)).thenReturn(expectedUserPoint)
+
+            //when
+            val exception = assertThrows<IllegalArgumentException>{
+                userPointService.useUserPoint(id, amount)
+            }
+
+            //then
+            assertEquals("사용하려는 포인트가 가지고있는 포인트보다 많습니다.", exception.message)
+
         }
     }
 

@@ -62,6 +62,13 @@ class PointController(private val userPointService: UserPointService,
         @PathVariable id: Long,
         @RequestBody amount: Long,
     ): UserPoint {
-        return UserPoint(0, 0, 0)
+        logger.info("포인트 사용 id : $id, amount : $amount")
+
+        if(amount < 0) {
+            val message = "사용 금액은 최소 0원 이상 부터 가능합니다. 현재 사용 요청 금액 : $amount"
+            throw IllegalArgumentException(message)
+        }
+
+        return userPointService.useUserPoint(id, amount);
     }
 }

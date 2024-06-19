@@ -1,4 +1,4 @@
-package io.hhplus.tdd.point.integration
+package io.hhplus.tdd.point.e2e
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.DisplayName
@@ -65,7 +65,7 @@ class PointControllerApiTest {
         @DisplayName("200 OK")
         fun success() {
             // given
-            val id: Long = 0
+            val id: Long = 1
             val updatePoint: Long = 1000
             val requestBody = objectMapper.writeValueAsString(updatePoint)
 
@@ -84,7 +84,7 @@ class PointControllerApiTest {
         @DisplayName("포인트가 0이하인 경우 ")
         fun failIfPointIsUnderZero() {
             // given
-            val id: Long = 0
+            val id: Long = 2
             val updatePoint: Long = -1000
             val requestBody = objectMapper.writeValueAsString(updatePoint)
 
@@ -103,7 +103,7 @@ class PointControllerApiTest {
     inner class PointUseTest {
         @Test
         fun `포인트 정상 사용`() {
-            val id: Long = 0
+            val id: Long = 3
             val amount: Long = 0
             val requestBody = objectMapper.writeValueAsString(amount)
 
@@ -120,7 +120,7 @@ class PointControllerApiTest {
 
         @Test
         fun `포인트 사용 금액 이 0원 미만일 경우`() {
-            val id: Long = 0
+            val id: Long = 4
             val amount: Long = -1000
             val requestBody = objectMapper.writeValueAsString(amount)
 
@@ -135,7 +135,7 @@ class PointControllerApiTest {
 
         @Test
         fun `포인트 사용 금액이 가지고 있는 포인트보다 큰 경우`() {
-            val id: Long = 0
+            val id: Long = 5
             val amount: Long = 1000
             val requestBody = objectMapper.writeValueAsString(amount)
 

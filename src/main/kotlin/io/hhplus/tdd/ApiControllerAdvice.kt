@@ -26,8 +26,9 @@ class ApiControllerAdvice : ResponseEntityExceptionHandler() {
     @ExceptionHandler(IllegalArgumentException::class)
     fun handleIllegalArgumentException(e: IllegalArgumentException): ResponseEntity<ErrorResponse> {
         logger.error(e.message)
+        val statusCode = HttpStatus.BAD_REQUEST.value()
         return ResponseEntity(
-            ErrorResponse("400", "에러가 발생했습니다."),
+            ErrorResponse(statusCode.toString(), e.message.toString()),
             HttpStatus.BAD_REQUEST,
         )
     }
