@@ -76,7 +76,7 @@ class UserPointServiceIntegrationTest {
     @Test
     fun `포인트 사용, 충전 동시성 테스트`() {
         //given
-        val id = 2L
+        val id = 3L
         val amount = 100L
         val numberOfThreads = 1000 // 동기처리를 하지 않았을 경우 높은 확률로 테스트 케이스가 실패하는 Thread 갯수
 

@@ -66,7 +66,7 @@ class PointHistoryRepositoryImplTest {
             PointHistory(7L, userId, transactionType, amount, updateMillis),
             PointHistory(8L, userId, transactionType, amount, updateMillis),
             PointHistory(9L, userId, transactionType, amount, updateMillis),
-            PointHistory(1L, userId, transactionType, amount, updateMillis)
+            PointHistory(10L, userId, transactionType, amount, updateMillis)
         )
 
         `when`(mockPointHistoryTable.selectAllByUserId(userId))
