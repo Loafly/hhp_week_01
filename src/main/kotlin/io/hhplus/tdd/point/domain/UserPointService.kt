@@ -22,18 +22,22 @@ class UserPointService(private val userPointRepository: UserPointRepository,
         synchronized(this) {
             val userPoint = getUserPointById(id)
             val totalPoint = userPoint.point + amount
-            val updateUserPoint = updateUserPoint(id, totalPoint)
-            pointHistoryService.save(id, amount, TransactionType.CHARGE, updateUserPoint.updateMillis)
-            return updateUserPoint
+            val updatedUserPoint = updateUserPoint(id, totalPoint)
+            pointHistoryService.save(id, amount, TransactionType.CHARGE, updatedUserPoint.updateMillis)
+            return updatedUserPoint
         }
     }
 
     fun useUserPoint(id: Long, amount: Long): UserPoint {
-        val userPoint = getUserPointById(id)
-        if(userPoint.point < amount) {
-            throw IllegalArgumentException("사용하려는 포인트가 가지고있는 포인트보다 많습니다.")
+        synchronized(this) {
+            val userPoint = getUserPointById(id)
+            if (userPoint.point < amount) {
+                throw IllegalArgumentException("사용하려는 포인트가 가지고있는 포인트보다 많습니다.")
+            }
+            val totalPoint = userPoint.point - amount
+            val updatedUserPoint = updateUserPoint(userPoint.id, totalPoint)
+            pointHistoryService.save(id, amount, TransactionType.USE, updatedUserPoint.updateMillis)
+            return updatedUserPoint
         }
-        val totalPoint = userPoint.point - amount
-        return updateUserPoint(userPoint.id, totalPoint)
     }
 }
