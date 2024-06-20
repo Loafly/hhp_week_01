@@ -57,7 +57,7 @@ class PointHistoryServiceTest {
         val amount = -100L
         val transactionType = TransactionType.CHARGE
         val updateMillis = System.currentTimeMillis()
-        `when`(mockPointHistoryRepository.save(userId, amount, transactionType, updateMillis)).thenThrow(IllegalArgumentException())
+        `when`(mockPointHistoryRepository.save(userId, amount, transactionType, updateMillis)).thenThrow(IllegalArgumentException("포인트는 0 이하일 수 없습니다."))
 
         //when
         val exception = assertThrows<IllegalArgumentException> {
@@ -66,5 +66,6 @@ class PointHistoryServiceTest {
 
         //then
         verify(mockPointHistoryRepository).save(userId, amount, transactionType, updateMillis)
+        assertEquals("포인트는 0 이하일 수 없습니다.", exception.message)
     }
 }
