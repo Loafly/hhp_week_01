@@ -28,6 +28,7 @@ class UserPointService(private val userPointRepository: UserPointRepository,
         }
     }
 
+    // 유저 포인트 사용
     fun useUserPoint(id: Long, amount: Long): UserPoint {
         synchronized(this) {
             val userPoint = getUserPointById(id)
