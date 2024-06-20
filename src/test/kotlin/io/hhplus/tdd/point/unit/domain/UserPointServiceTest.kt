@@ -11,9 +11,10 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.BDDMockito.given
+import org.mockito.BDDMockito.then
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 
 @ExtendWith(MockitoExtension::class)
@@ -34,12 +35,13 @@ class UserPointServiceTest {
     fun `포인트 조회`() {
         // given
         val expectedUserPoint = UserPoint(id = 1, point = 100, updateMillis = 1000) //기대 객체 생성
-        `when`(mockUserPointRepository.findById(expectedUserPoint.id)).thenReturn(expectedUserPoint) // mockUserPointRepository의 findById 함수 호출 시 기대객체로 반환
+        given(mockUserPointRepository.findById(expectedUserPoint.id)).willReturn(expectedUserPoint) // mockUserPointRepository의 findById 함수 호출 시 기대객체로 반환
 
         // when
         val userPoint = userPointService.getUserPointById(expectedUserPoint.id)
 
         // then
+        then(mockUserPointRepository).should().findById(expectedUserPoint.id)
         assertNotNull(userPoint)
         assertEquals(expectedUserPoint, userPoint)
     }
@@ -53,13 +55,15 @@ class UserPointServiceTest {
             val expectedFindUserPoint = UserPoint(id = 1, point = 100, updateMillis = 1000) //기대 객체 생성
             val amount: Long = 50
             val expectedSaveUserPoint = UserPoint(id = 1, point = expectedFindUserPoint.point + amount, updateMillis = 1000) //기대 객체 생성
-            `when`(mockUserPointRepository.findById(expectedFindUserPoint.id)).thenReturn(expectedFindUserPoint) // mockUserPointRepository의 findById 함수 호출 시 기대객체로 반환
-            `when`(mockUserPointRepository.save(expectedSaveUserPoint.id, expectedSaveUserPoint.point)).thenReturn(expectedSaveUserPoint) // mockUserPointRepository의 save 함수 호출 시 기대객체로 반환
+            given(mockUserPointRepository.findById(expectedFindUserPoint.id)).willReturn(expectedFindUserPoint) // mockUserPointRepository의 findById 함수 호출 시 기대객체로 반환
+            given(mockUserPointRepository.save(expectedSaveUserPoint.id, expectedSaveUserPoint.point)).willReturn(expectedSaveUserPoint) // mockUserPointRepository의 save 함수 호출 시 기대객체로 반환
 
             // when
             val userPoint = userPointService.chargeUserPoint(expectedFindUserPoint.id, amount)
 
             // then
+            then(mockUserPointRepository).should().findById(expectedFindUserPoint.id)
+            then(mockUserPointRepository).should().save(expectedSaveUserPoint.id, expectedSaveUserPoint.point)
             assertNotNull(userPoint)
             assertEquals(expectedSaveUserPoint, userPoint)
         }
@@ -77,15 +81,17 @@ class UserPointServiceTest {
             val totalPoint = point - amount
 
             val expectedFindUserPoint = UserPoint(id = id, point = point, updateMillis = 1000)
-            `when`(mockUserPointRepository.findById(id)).thenReturn(expectedFindUserPoint)
+            given(mockUserPointRepository.findById(id)).willReturn(expectedFindUserPoint)
 
             val expectedSaveUserPoint = UserPoint(id = id, point = totalPoint, updateMillis = 1000)
-            `when`(mockUserPointRepository.save(id, totalPoint)).thenReturn(expectedSaveUserPoint)
+            given(mockUserPointRepository.save(id, totalPoint)).willReturn(expectedSaveUserPoint)
 
             //when
             val result = userPointService.useUserPoint(id, amount)
 
             //then
+            then(mockUserPointRepository).should().findById(id)
+            then(mockUserPointRepository).should().save(id, totalPoint)
             assertNotNull(result)
             assertEquals(expectedSaveUserPoint, result)
         }
@@ -97,7 +103,7 @@ class UserPointServiceTest {
             val amount = 1000L
             val point = 500L
             val expectedUserPoint = UserPoint(id = id, point = point, updateMillis = 1000)
-            `when`(mockUserPointRepository.findById(id)).thenReturn(expectedUserPoint)
+            given(mockUserPointRepository.findById(id)).willReturn(expectedUserPoint)
 
             //when
             val exception = assertThrows<IllegalArgumentException>{
@@ -105,6 +111,7 @@ class UserPointServiceTest {
             }
 
             //then
+            then(mockUserPointRepository).should().findById(id)
             assertEquals("사용하려는 포인트가 가지고있는 포인트보다 많습니다.", exception.message)
 
         }
