@@ -6,6 +6,8 @@ import io.hhplus.tdd.point.infra.UserPointRepositoryImpl
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.BDDMockito.given
+import org.mockito.BDDMockito.then
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
@@ -26,12 +28,13 @@ class UserPointRepositoryImplTest {
     fun `UserPoint 조회`() {
         // given
         val expectedUserPoint = UserPoint(id = 1, point = 100, updateMillis = 1000)
-        `when`(mockUserPointTable.selectById(expectedUserPoint.id)).thenReturn(expectedUserPoint)
+        given(mockUserPointTable.selectById(expectedUserPoint.id)).willReturn(expectedUserPoint)
 
         // when
         val result = userPointRepository.findById(expectedUserPoint.id)
 
         // then
+        then(mockUserPointTable).should().selectById(expectedUserPoint.id)
         assertEquals(expectedUserPoint, result)
     }
 
@@ -39,12 +42,14 @@ class UserPointRepositoryImplTest {
     fun `UserPoint 업데이트`() {
         // given
         val expectedUserPoint = UserPoint(id = 1, point = 100, updateMillis = 1000)
-        `when`(mockUserPointTable.insertOrUpdate(expectedUserPoint.id, expectedUserPoint.point)).thenReturn(expectedUserPoint)
+        given(mockUserPointTable.insertOrUpdate(expectedUserPoint.id, expectedUserPoint.point))
+            .willReturn(expectedUserPoint)
 
         // when
         val result = userPointRepository.save(expectedUserPoint.id, expectedUserPoint.point)
 
         // then
+        then(mockUserPointTable).should().insertOrUpdate(expectedUserPoint.id, expectedUserPoint.point)
         assertEquals(expectedUserPoint, result)
     }
 

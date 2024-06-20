@@ -4,14 +4,13 @@ import io.hhplus.tdd.database.PointHistoryTable
 import io.hhplus.tdd.point.domain.PointHistory
 import io.hhplus.tdd.point.domain.TransactionType
 import io.hhplus.tdd.point.infra.PointHistoryRepositoryImpl
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.BDDMockito.given
+import org.mockito.BDDMockito.then
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 
 @ExtendWith(MockitoExtension::class)
@@ -34,8 +33,8 @@ class PointHistoryRepositoryImplTest {
         val updateMillis = System.currentTimeMillis()
         val expectedPointHistory = PointHistory(id, userId, transactionType, amount, updateMillis)
 
-        `when`(mockPointHistoryTable.insert(userId, amount, transactionType, updateMillis))
-            .thenReturn(expectedPointHistory)
+        given(mockPointHistoryTable.insert(userId, amount, transactionType, updateMillis))
+            .willReturn(expectedPointHistory)
 
         // when
         val result = pointHistoryRepository.save(
@@ -43,7 +42,7 @@ class PointHistoryRepositoryImplTest {
         )
 
         // then
-        verify(mockPointHistoryTable).insert(userId, amount, transactionType, updateMillis)
+        then(mockPointHistoryTable).should().insert(userId, amount, transactionType, updateMillis)
         assertEquals(result, expectedPointHistory)
     }
 
@@ -69,12 +68,13 @@ class PointHistoryRepositoryImplTest {
             PointHistory(10L, userId, transactionType, amount, updateMillis)
         )
 
-        `when`(mockPointHistoryTable.selectAllByUserId(userId))
-            .thenReturn(expectedPointHistoryList)
+        given(mockPointHistoryTable.selectAllByUserId(userId))
+            .willReturn(expectedPointHistoryList)
         //when
         val result = pointHistoryRepository.findAllByUserId(userId)
 
         //then
+        then(mockPointHistoryTable).should().selectAllByUserId(userId)
         assertEquals(size, result.size)
     }
 }
