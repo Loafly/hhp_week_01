@@ -1,5 +1,7 @@
 package io.hhplus.tdd.point.domain
 
+import io.hhplus.tdd.exception.InvalidPointAmountException
+
 data class PointHistory(
     val id: Long,
     val userId: Long,
@@ -9,7 +11,7 @@ data class PointHistory(
 ) {
     init {
         if (amount < 0) {
-            throw IllegalArgumentException("포인트는 0 이하일 수 없습니다.")
+            throw InvalidPointAmountException("포인트는 0 이하일 수 없습니다.")
         }
     }
 }

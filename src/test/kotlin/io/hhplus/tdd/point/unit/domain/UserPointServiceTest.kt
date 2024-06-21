@@ -1,6 +1,9 @@
 package io.hhplus.tdd.point.unit.domain
 
+import io.hhplus.tdd.exception.NotEnoughPointsException
+import io.hhplus.tdd.point.domain.PointHistory
 import io.hhplus.tdd.point.domain.PointHistoryService
+import io.hhplus.tdd.point.domain.TransactionType
 import io.hhplus.tdd.point.domain.UserPoint
 import io.hhplus.tdd.point.domain.UserPointService
 import io.hhplus.tdd.point.infra.UserPointRepository
@@ -55,8 +58,12 @@ class UserPointServiceTest {
             val expectedFindUserPoint = UserPoint(id = 1, point = 100, updateMillis = 1000) //기대 객체 생성
             val amount: Long = 50
             val expectedSaveUserPoint = UserPoint(id = 1, point = expectedFindUserPoint.point + amount, updateMillis = 1000) //기대 객체 생성
+            val expectedSavePointHistory = PointHistory(1L, 1L, TransactionType.USE, amount, expectedSaveUserPoint.updateMillis)
+
             given(mockUserPointRepository.findById(expectedFindUserPoint.id)).willReturn(expectedFindUserPoint) // mockUserPointRepository의 findById 함수 호출 시 기대객체로 반환
             given(mockUserPointRepository.save(expectedSaveUserPoint.id, expectedSaveUserPoint.point)).willReturn(expectedSaveUserPoint) // mockUserPointRepository의 save 함수 호출 시 기대객체로 반환
+            given(pointHistoryService.save(expectedSaveUserPoint.id, amount, TransactionType.CHARGE, expectedSaveUserPoint.updateMillis))
+                .willReturn(expectedSavePointHistory)
 
             // when
             val userPoint = userPointService.chargeUserPoint(expectedFindUserPoint.id, amount)
@@ -64,6 +71,7 @@ class UserPointServiceTest {
             // then
             then(mockUserPointRepository).should().findById(expectedFindUserPoint.id)
             then(mockUserPointRepository).should().save(expectedSaveUserPoint.id, expectedSaveUserPoint.point)
+            then(pointHistoryService).should().save(expectedSaveUserPoint.id, amount, TransactionType.CHARGE, expectedSaveUserPoint.updateMillis)
             assertNotNull(userPoint)
             assertEquals(expectedSaveUserPoint, userPoint)
         }
@@ -81,10 +89,13 @@ class UserPointServiceTest {
             val totalPoint = point - amount
 
             val expectedFindUserPoint = UserPoint(id = id, point = point, updateMillis = 1000)
-            given(mockUserPointRepository.findById(id)).willReturn(expectedFindUserPoint)
-
             val expectedSaveUserPoint = UserPoint(id = id, point = totalPoint, updateMillis = 1000)
+            val expectedSavePointHistory = PointHistory(1L, id, TransactionType.USE, amount, expectedSaveUserPoint.updateMillis)
+
+            given(mockUserPointRepository.findById(id)).willReturn(expectedFindUserPoint)
             given(mockUserPointRepository.save(id, totalPoint)).willReturn(expectedSaveUserPoint)
+            given(pointHistoryService.save(expectedSaveUserPoint.id, amount, TransactionType.USE, expectedSaveUserPoint.updateMillis))
+                .willReturn(expectedSavePointHistory)
 
             //when
             val result = userPointService.useUserPoint(id, amount)
@@ -92,6 +103,7 @@ class UserPointServiceTest {
             //then
             then(mockUserPointRepository).should().findById(id)
             then(mockUserPointRepository).should().save(id, totalPoint)
+            then(pointHistoryService).should().save(expectedSaveUserPoint.id, amount, TransactionType.USE, expectedSaveUserPoint.updateMillis)
             assertNotNull(result)
             assertEquals(expectedSaveUserPoint, result)
         }
@@ -106,13 +118,13 @@ class UserPointServiceTest {
             given(mockUserPointRepository.findById(id)).willReturn(expectedUserPoint)
 
             //when
-            val exception = assertThrows<IllegalArgumentException>{
+            val exception = assertThrows<NotEnoughPointsException>{
                 userPointService.useUserPoint(id, amount)
             }
 
             //then
             then(mockUserPointRepository).should().findById(id)
-            assertEquals("사용하려는 포인트가 가지고있는 포인트보다 많습니다.", exception.message)
+            assertEquals("포인트가 부족합니다. 현재 포인트: ${point}, 사용하려는 포인트: ${amount}", exception.message)
 
         }
     }

@@ -66,8 +66,8 @@ class PointControllerApiTest {
         fun success() {
             // given
             val id: Long = 1
-            val updatePoint: Long = 1000
-            val requestBody = objectMapper.writeValueAsString(updatePoint)
+            val amount: Long = 1000
+            val requestBody = objectMapper.writeValueAsString(amount)
 
             // when then
             mockMvc.perform(
@@ -77,7 +77,7 @@ class PointControllerApiTest {
             )
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.id").value(id))
-                .andExpect(jsonPath("$.point").value(updatePoint))
+                .andExpect(jsonPath("$.point").value(amount))
         }
 
         @Test
@@ -85,8 +85,8 @@ class PointControllerApiTest {
         fun failIfPointIsUnderZero() {
             // given
             val id: Long = 2
-            val updatePoint: Long = -1000
-            val requestBody = objectMapper.writeValueAsString(updatePoint)
+            val amount: Long = -1000
+            val requestBody = objectMapper.writeValueAsString(amount)
 
             // when then
             mockMvc.perform(
@@ -95,6 +95,7 @@ class PointControllerApiTest {
                     .content(requestBody)
             )
                 .andExpect(status().is4xxClientError)
+                .andExpect(jsonPath("$.message").value("충전 금액은 최소 1원 이상 부터 가능합니다. 현재 충전 요청 금액 : $amount"))
         }
     }
 
@@ -131,6 +132,7 @@ class PointControllerApiTest {
                     .content(requestBody)
             )
                 .andExpect(status().is4xxClientError)
+                .andExpect(jsonPath("$.message").value("사용 금액은 최소 0원 이상 부터 가능합니다. 현재 사용 요청 금액 : $amount"))
         }
 
         @Test
@@ -146,6 +148,7 @@ class PointControllerApiTest {
                     .content(requestBody)
             )
                 .andExpect(status().is4xxClientError)
+                .andExpect(jsonPath("$.message").value("포인트가 부족합니다. 현재 포인트: 0, 사용하려는 포인트: ${amount}"))
         }
     }
 }
