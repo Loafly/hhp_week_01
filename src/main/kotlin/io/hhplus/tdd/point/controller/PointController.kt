@@ -1,5 +1,6 @@
 package io.hhplus.tdd.point.controller
 
+import io.hhplus.tdd.exception.InvalidAmountRequestException
 import io.hhplus.tdd.point.domain.PointHistoryService
 import io.hhplus.tdd.point.domain.UserPointService
 import org.slf4j.Logger
@@ -52,9 +53,9 @@ class PointController(
     ): PointDto.UserPointResponse {
         logger.info("포인트 업데이트 id : $id, amount : $amount")
 
-        if (amount < 0) {
+        if (amount <= 0) {
             val message = "충전 금액은 최소 1원 이상 부터 가능합니다. 현재 충전 요청 금액 : $amount"
-            throw IllegalArgumentException(message)
+            throw InvalidAmountRequestException(message)
         }
 
         return PointDto.UserPointResponse(userPointService.chargeUserPoint(id, amount))
@@ -72,7 +73,7 @@ class PointController(
 
         if (amount < 0) {
             val message = "사용 금액은 최소 0원 이상 부터 가능합니다. 현재 사용 요청 금액 : $amount"
-            throw IllegalArgumentException(message)
+            throw InvalidAmountRequestException(message)
         }
 
         return PointDto.UserPointResponse(userPointService.useUserPoint(id, amount))

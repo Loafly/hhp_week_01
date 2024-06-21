@@ -1,5 +1,6 @@
 package io.hhplus.tdd
 
+import io.hhplus.tdd.exception.InvalidAmountRequestException
 import io.hhplus.tdd.exception.InvalidPointAmountException
 import io.hhplus.tdd.exception.NotEnoughPointsException
 import org.slf4j.Logger
@@ -48,6 +49,17 @@ class ApiControllerAdvice : ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(InvalidPointAmountException::class)
     fun handleNotEnoughPointsExceptionException(e: InvalidPointAmountException): ResponseEntity<ErrorResponse> {
+        logger.error(e.message)
+
+        val statusCode = HttpStatus.BAD_REQUEST.value()
+        return ResponseEntity(
+            ErrorResponse(statusCode.toString(), e.message.toString()),
+            HttpStatus.BAD_REQUEST,
+        )
+    }
+
+    @ExceptionHandler(InvalidAmountRequestException::class)
+    fun handleNotEnoughPointsExceptionException(e: InvalidAmountRequestException): ResponseEntity<ErrorResponse> {
         logger.error(e.message)
 
         val statusCode = HttpStatus.BAD_REQUEST.value()
