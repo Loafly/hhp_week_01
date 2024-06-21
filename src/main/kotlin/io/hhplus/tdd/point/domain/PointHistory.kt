@@ -6,7 +6,13 @@ data class PointHistory(
     val type: TransactionType,
     val amount: Long,
     val timeMillis: Long,
-)
+) {
+    init {
+        if (amount < 0) {
+            throw IllegalArgumentException("포인트는 0 이하일 수 없습니다.")
+        }
+    }
+}
 
 /**
  * 포인트 트랜잭션 종류

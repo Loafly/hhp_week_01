@@ -1,6 +1,7 @@
-package io.hhplus.tdd.point
+package io.hhplus.tdd.point.controller
 
 import io.hhplus.tdd.point.domain.PointHistory
+import io.hhplus.tdd.point.domain.PointHistoryService
 import io.hhplus.tdd.point.domain.UserPoint
 import io.hhplus.tdd.point.domain.UserPointService
 import org.slf4j.Logger
@@ -9,7 +10,8 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/point")
-class PointController(private val userPointService: UserPointService) {
+class PointController(private val userPointService: UserPointService,
+                      private val pointHistoryService: PointHistoryService) {
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     /**
@@ -19,6 +21,7 @@ class PointController(private val userPointService: UserPointService) {
     fun point(
         @PathVariable id: Long,
     ): UserPoint {
+        logger.info("Get point by id: $id")
         return userPointService.getUserPointById(id)
     }
 
@@ -29,7 +32,8 @@ class PointController(private val userPointService: UserPointService) {
     fun history(
         @PathVariable id: Long,
     ): List<PointHistory> {
-        return emptyList()
+        logger.info("Get point List by userId: $id")
+        return pointHistoryService.getAllByUserId(id)
     }
 
     /**
@@ -38,9 +42,16 @@ class PointController(private val userPointService: UserPointService) {
     @PatchMapping("{id}/charge")
     fun charge(
         @PathVariable id: Long,
-        @RequestBody amount: Long,
+        @RequestBody amount: Long
     ): UserPoint {
-        return UserPoint(0, 0, 0)
+        logger.info("포인트 업데이트 id : $id, amount : $amount")
+
+        if(amount < 0) {
+            val message = "충전 금액은 최소 1원 이상 부터 가능합니다. 현재 충전 요청 금액 : $amount"
+            throw IllegalArgumentException(message)
+        }
+
+        return userPointService.chargeUserPoint(id, amount)
     }
 
     /**
@@ -51,6 +62,13 @@ class PointController(private val userPointService: UserPointService) {
         @PathVariable id: Long,
         @RequestBody amount: Long,
     ): UserPoint {
-        return UserPoint(0, 0, 0)
+        logger.info("포인트 사용 id : $id, amount : $amount")
+
+        if(amount < 0) {
+            val message = "사용 금액은 최소 0원 이상 부터 가능합니다. 현재 사용 요청 금액 : $amount"
+            throw IllegalArgumentException(message)
+        }
+
+        return userPointService.useUserPoint(id, amount);
     }
 }
