@@ -1,5 +1,6 @@
 package io.hhplus.tdd.point.domain
 
+import io.hhplus.tdd.exception.NotEnoughPointsException
 import io.hhplus.tdd.point.infra.UserPointRepository
 import org.springframework.stereotype.Service
 
@@ -33,7 +34,7 @@ class UserPointService(private val userPointRepository: UserPointRepository,
         synchronized(this) {
             val userPoint = getUserPointById(id)
             if (userPoint.point < amount) {
-                throw IllegalArgumentException("사용하려는 포인트가 가지고있는 포인트보다 많습니다.")
+                throw NotEnoughPointsException("포인트가 부족합니다. 현재 포인트: ${userPoint.point}, 사용하려는 포인트: ${amount}")
             }
             val totalPoint = userPoint.point - amount
             val updatedUserPoint = updateUserPoint(userPoint.id, totalPoint)

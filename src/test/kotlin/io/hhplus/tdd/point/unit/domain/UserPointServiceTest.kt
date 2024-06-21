@@ -1,5 +1,6 @@
 package io.hhplus.tdd.point.unit.domain
 
+import io.hhplus.tdd.exception.NotEnoughPointsException
 import io.hhplus.tdd.point.domain.PointHistoryService
 import io.hhplus.tdd.point.domain.UserPoint
 import io.hhplus.tdd.point.domain.UserPointService
@@ -106,13 +107,13 @@ class UserPointServiceTest {
             given(mockUserPointRepository.findById(id)).willReturn(expectedUserPoint)
 
             //when
-            val exception = assertThrows<IllegalArgumentException>{
+            val exception = assertThrows<NotEnoughPointsException>{
                 userPointService.useUserPoint(id, amount)
             }
 
             //then
             then(mockUserPointRepository).should().findById(id)
-            assertEquals("사용하려는 포인트가 가지고있는 포인트보다 많습니다.", exception.message)
+            assertEquals("포인트가 부족합니다. 현재 포인트: ${point}, 사용하려는 포인트: ${amount}", exception.message)
 
         }
     }
