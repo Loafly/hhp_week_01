@@ -25,8 +25,13 @@ class ApiControllerAdvice : ResponseEntityExceptionHandler() {
         )
     }
 
-    @ExceptionHandler(IllegalArgumentException::class)
-    fun handleIllegalArgumentException(e: IllegalArgumentException): ResponseEntity<ErrorResponse> {
+    @ExceptionHandler(value = [
+        IllegalArgumentException::class,
+        NotEnoughPointsException::class,
+        InvalidPointAmountException::class,
+        InvalidAmountRequestException::class
+    ])
+    fun handleCommonExceptions(e: Exception): ResponseEntity<ErrorResponse> {
         logger.error(e.message)
 
         val statusCode = HttpStatus.BAD_REQUEST.value()
@@ -35,39 +40,5 @@ class ApiControllerAdvice : ResponseEntityExceptionHandler() {
             HttpStatus.BAD_REQUEST,
         )
     }
-
-    @ExceptionHandler(NotEnoughPointsException::class)
-    fun handleNotEnoughPointsExceptionException(e: NotEnoughPointsException): ResponseEntity<ErrorResponse> {
-        logger.error(e.message)
-
-        val statusCode = HttpStatus.BAD_REQUEST.value()
-        return ResponseEntity(
-            ErrorResponse(statusCode.toString(), e.message.toString()),
-            HttpStatus.BAD_REQUEST,
-        )
-    }
-
-    @ExceptionHandler(InvalidPointAmountException::class)
-    fun handleNotEnoughPointsExceptionException(e: InvalidPointAmountException): ResponseEntity<ErrorResponse> {
-        logger.error(e.message)
-
-        val statusCode = HttpStatus.BAD_REQUEST.value()
-        return ResponseEntity(
-            ErrorResponse(statusCode.toString(), e.message.toString()),
-            HttpStatus.BAD_REQUEST,
-        )
-    }
-
-    @ExceptionHandler(InvalidAmountRequestException::class)
-    fun handleNotEnoughPointsExceptionException(e: InvalidAmountRequestException): ResponseEntity<ErrorResponse> {
-        logger.error(e.message)
-
-        val statusCode = HttpStatus.BAD_REQUEST.value()
-        return ResponseEntity(
-            ErrorResponse(statusCode.toString(), e.message.toString()),
-            HttpStatus.BAD_REQUEST,
-        )
-    }
-
 
 }
